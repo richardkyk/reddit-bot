@@ -118,6 +118,7 @@ client.on("message", async (message) => {
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
   console.log("old", oldPresence);
+  console.log("new", newPresence);
   const oldPresenceString = oldPresence.activities.map((x) =>
     JSON.stringify(x)
   );
@@ -125,6 +126,7 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
   const newPresenceString = newPresence.activities.map((x) =>
     JSON.stringify(x)
   );
+  console.log(newPresenceString);
 
   if (oldPresenceString.length === newPresenceString.length) {
     const newActivity = JSON.parse(
