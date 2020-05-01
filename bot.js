@@ -122,13 +122,13 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
   const oldPresenceString = oldPresence.activities.map((x) =>
     JSON.stringify(x)
   );
-  console.log(oldPresenceString);
+  console.log("oldString", oldPresenceString);
   const newPresenceString = newPresence.activities.map((x) =>
     JSON.stringify(x)
   );
-  console.log(newPresenceString);
+  console.log("newString", newPresenceString);
 
-  if (oldPresenceString.length === newPresenceString.length) {
+  if ((oldPresenceString.length === newPresenceString.length) !== 0) {
     const newActivity = JSON.parse(
       newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
     );
