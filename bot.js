@@ -117,9 +117,11 @@ client.on("message", async (message) => {
 });
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
+  console.log("old", oldPresence);
   const oldPresenceString = oldPresence.activities.map((x) =>
     JSON.stringify(x)
   );
+  console.log(oldPresenceString);
   const newPresenceString = newPresence.activities.map((x) =>
     JSON.stringify(x)
   );
