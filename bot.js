@@ -128,7 +128,10 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
   );
   console.log("newString", newPresenceString);
 
-  if ((oldPresenceString.length === newPresenceString.length) !== 0) {
+  if (
+    oldPresenceString.length === newPresenceString.length &&
+    oldPresenceString.length !== 0
+  ) {
     const newActivity = JSON.parse(
       newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
     );
