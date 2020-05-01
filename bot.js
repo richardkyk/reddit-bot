@@ -97,7 +97,7 @@ client.on("message", async (message) => {
       const username = message.member.toString();
       const outputTable = [["Activity", "Duration"]];
       for ([key, value] of output) {
-        outputTable.push([key, convertTime(value / 1000)]);
+        outputTable.push([key, convertTime(Math.floor(~~(value / 1000)))]);
       }
 
       if (outputTable.length == 1) {
