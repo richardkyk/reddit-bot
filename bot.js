@@ -128,7 +128,10 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
 
   if (oldPresenceString.length === newPresenceString.length) {
     if (oldPresenceString.length !== 0) {
-      console.log("This is #2", oldPresenceString);
+      console.log("This is oldString", oldPresenceString);
+      console.log("This is newString", newPresenceString);
+      // There is a bug here
+      // What happens when it cant actually find a matching string
       const newActivity = JSON.parse(
         newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
       );
