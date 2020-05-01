@@ -117,12 +117,14 @@ client.on("message", async (message) => {
 });
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
-  const oldPresenceString = oldPresence.activities.map((x) =>
-    JSON.stringify(x)
-  );
-  const newPresenceString = newPresence.activities.map((x) =>
-    JSON.stringify(x)
-  );
+  const oldPresenceString = oldPresence
+    ? oldPresence.activities.map((x) => JSON.stringify(x))
+    : [];
+  console.log("This is being output", oldPresence);
+
+  const newPresenceString = newPresence
+    ? newPresence.activities.map((x) => JSON.stringify(x))
+    : [];
 
   if (oldPresenceString.length === newPresenceString.length) {
     if (oldPresenceString.length !== 0) {
