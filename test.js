@@ -12,4 +12,4 @@ function convertTime(sec) {
   return hours + ":" + min + ":" + sec;
 }
 
-console.log(convertTime(~~(32003232 / 1000)));
+console.log(convertTime(~~(1139303232 / 1000)));

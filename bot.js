@@ -117,10 +117,10 @@ client.on("message", async (message) => {
 });
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
+  console.log("This is being output", oldPresence);
   const oldPresenceString = oldPresence
     ? oldPresence.activities.map((x) => JSON.stringify(x))
     : [];
-  console.log("This is being output", oldPresence);
 
   const newPresenceString = newPresence
     ? newPresence.activities.map((x) => JSON.stringify(x))
@@ -128,6 +128,7 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
 
   if (oldPresenceString.length === newPresenceString.length) {
     if (oldPresenceString.length !== 0) {
+      console.log("This is #2", oldPresenceString);
       const newActivity = JSON.parse(
         newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
       );
