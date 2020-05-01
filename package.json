@@ -1,12 +1,14 @@
 {
   "name": "reddit-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Grabs hot posts from subreddit",
   "main": "bot.js",
   "author": "Richard",
   "dependencies": {
+    "aws-sdk": "^2.667.0",
     "axios": "^0.19.2",
     "discord.js": "^12.0.2",
-    "snoowrap": "^1.21.0"
+    "snoowrap": "^1.21.0",
+    "table": "^5.4.6"
   }
 }
