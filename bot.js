@@ -97,7 +97,7 @@ client.on("message", async (message) => {
       const username = message.member.toString();
       const outputTable = [["Activity", "Duration"]];
       for ([key, value] of output) {
-        outputTable.push([key, new Date(value).toISOString().substr(11, 8)]);
+        outputTable.push([key, convertTime(value / 1000)]);
       }
 
       if (outputTable.length == 1) {
@@ -117,45 +117,40 @@ client.on("message", async (message) => {
 });
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
-  console.log("old", oldPresence);
-  console.log("new", newPresence);
   const oldPresenceString = oldPresence.activities.map((x) =>
     JSON.stringify(x)
   );
-  console.log("oldString", oldPresenceString);
   const newPresenceString = newPresence.activities.map((x) =>
     JSON.stringify(x)
   );
-  console.log("newString", newPresenceString);
 
-  if (
-    oldPresenceString.length === newPresenceString.length &&
-    oldPresenceString.length !== 0
-  ) {
-    const newActivity = JSON.parse(
-      newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
-    );
-
-    const oldActivity = JSON.parse(
-      oldPresenceString.filter((x) => !newPresenceString.includes(x))[0]
-    );
-
-    if (oldActivity.name === newActivity.name) {
-      console.log(
-        `${newPresence.member.user.username} updated ${newActivity.name}`
-      );
-      dynamodb.updateItem(
-        oldPresence.user.id,
-        oldActivity.createdTimestamp,
-        "endedTimestamp",
-        Date.now()
+  if (oldPresenceString.length === newPresenceString.length) {
+    if (oldPresenceString.length !== 0) {
+      const newActivity = JSON.parse(
+        newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
       );
 
-      dynamodb.saveItem({
-        userId: newPresence.user.id,
-        createdTimestamp: newActivity.createdTimestamp,
-        activity: newActivity.name,
-      });
+      const oldActivity = JSON.parse(
+        oldPresenceString.filter((x) => !newPresenceString.includes(x))[0]
+      );
+
+      if (oldActivity.name === newActivity.name) {
+        console.log(
+          `${newPresence.member.user.username} updated ${newActivity.name}`
+        );
+        dynamodb.updateItem(
+          oldPresence.user.id,
+          oldActivity.createdTimestamp,
+          "endedTimestamp",
+          Date.now()
+        );
+
+        dynamodb.saveItem({
+          userId: newPresence.user.id,
+          createdTimestamp: newActivity.createdTimestamp,
+          activity: newActivity.name,
+        });
+      }
     }
   } else {
     if (newPresenceString.length > oldPresenceString.length) {
@@ -187,3 +182,16 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
   }
 });
 client.login(config.token);
+
+function convertTime(sec) {
+  var hours = Math.floor(sec / 3600);
+  hours >= 1 ? (sec = sec - hours * 3600) : (hours = "00");
+  var min = Math.floor(sec / 60);
+  min >= 1 ? (sec = sec - min * 60) : (min = "00");
+  sec < 1 ? (sec = "00") : void 0;
+
+  min.toString().length == 1 ? (min = "0" + min) : void 0;
+  sec.toString().length == 1 ? (sec = "0" + sec) : void 0;
+
+  return hours + ":" + min + ":" + sec;
+}
