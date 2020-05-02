@@ -22,8 +22,8 @@ const newPresenceString = [
 
 // result = newPresenceString.filter((x) => !oldPresenceString.includes(x));
 
-const oldPresenceString2 = [].toString();
+const oldPresenceString2 = ["test", "2"];
 const newPresenceString2 = [].toString();
 // result = newPresenceString2.filter((x) => !oldPresenceString2.includes(x));
-console.log(oldPresenceString2);
-console.log(oldPresenceString2 == newPresenceString2);
+console.log("/n");
+console.log("OldPresence", JSON.parse(oldPresenceString));

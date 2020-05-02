@@ -6,17 +6,15 @@ const dynamodb = require("./GameActivity");
 const { table } = require("table");
 
 const r = new snoowrap({ ...credentials });
-const devId = "692650070956310568";
-const stoveId = "166136330345119744";
 
 const client = new Discord.Client();
 client.once("ready", () => {
   console.log("Ready!");
-  client.user.setPresence({
-    status: "online",
-    activity: { name: "with my pp" },
-  });
-  client.guilds.cache.get(stoveId).presences.cache.forEach((user) => {
+  // client.user.setPresence({
+  //   status: "online",
+  //   activity: { name: "with my pp" },
+  // });
+  client.guilds.cache.get(config.guild).presences.cache.forEach((user) => {
     for (activity of user.activities) {
       dynamodb.saveItem({
         userId: user.userID,
@@ -63,13 +61,36 @@ client.on("message", async (message) => {
     } catch {
       message.channel.send(`Sorry, I couldn't find any posts in r/${query}`);
     }
-  } else if (message.content === prefix + "user-info") {
-    message.channel.send(
-      "Your username: " +
-        message.author.username +
-        "\nYour ID: " +
-        message.author.id
-    );
+  } else if (message.content.startsWith("!poll")) {
+    const colours = ["🟦", "🟪", "🟫", "🟥", "🟧", "🟨"];
+    let data = message.content.replace("!poll", "").replace("?", "").split("|");
+    data = data.map((x) => x.trim()).filter((x) => x != "");
+    const question = `${data.shift()}?`;
+    if (data.length == 0) {
+      // Yes or no question
+      const emojiNo = message.guild.emojis.cache.find(
+        (emoji) => emoji.name === "7685_no"
+      );
+      const emojiYes = message.guild.emojis.cache.find(
+        (emoji) => emoji.name === "2990_yes"
+      );
+      msg = await message.channel.send(`**${question}**`);
+      await msg.react(emojiNo);
+      await msg.react(emojiYes);
+    } else if (data.length > 1) {
+      // Multi choice questions, max options is the number of colours
+      data = data.slice(0, colours.length);
+      const options = [];
+      for (let i = 0; i < data.length; i++) {
+        options.push(`${colours[i]} ${data[i]}`);
+      }
+      msg = await message.channel.send(
+        `**${question}**\n${options.join("\n")}`
+      );
+      for (let i = 0; i < data.length; i++) {
+        msg.react(colours[i]);
+      }
+    }
   } else if (message.content === prefix + "stats") {
     const data = await dynamodb.getItems(message.author.id);
     const results = {};
@@ -130,8 +151,9 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
       oldPresenceString.length !== 0 &&
       oldPresenceString.toString() !== newPresenceString.toString()
     ) {
-      console.log("This is oldString", oldPresenceString);
-      console.log("This is newString", newPresenceString);
+      console.log();
+      console.log("old Presence", JSON.parse(oldPresenceString));
+      console.log("new Presence", JSON.parse(newPresenceString));
       // There is a bug here
       // When the newPresence is the same as the oldPresence
       // There will not be a "new" activity, or an "old" one, they are both the same
