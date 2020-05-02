@@ -117,7 +117,6 @@ client.on("message", async (message) => {
 });
 
 client.on("presenceUpdate", (oldPresence, newPresence) => {
-  console.log("This is being output", oldPresence);
   const oldPresenceString = oldPresence
     ? oldPresence.activities.map((x) => JSON.stringify(x))
     : [];
@@ -127,11 +126,15 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
     : [];
 
   if (oldPresenceString.length === newPresenceString.length) {
-    if (oldPresenceString.length !== 0) {
+    if (
+      oldPresenceString.length !== 0 &&
+      oldPresenceString.toString() !== newPresenceString.toString()
+    ) {
       console.log("This is oldString", oldPresenceString);
       console.log("This is newString", newPresenceString);
       // There is a bug here
-      // What happens when it cant actually find a matching string
+      // When the newPresence is the same as the oldPresence
+      // There will not be a "new" activity, or an "old" one, they are both the same
       const newActivity = JSON.parse(
         newPresenceString.filter((x) => !oldPresenceString.includes(x))[0]
       );
