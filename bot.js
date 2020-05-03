@@ -3,11 +3,20 @@ const config = require("./config.json");
 const credentials = require("./credentials.json");
 const snoowrap = require("snoowrap");
 const dynamodb = require("./GameActivity");
-const { table } = require("table");
+const fs = require("fs");
 
 const r = new snoowrap({ ...credentials });
-
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
+
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
+
 client.once("ready", () => {
   console.log("Ready!");
   // client.user.setPresence({
@@ -62,78 +71,9 @@ client.on("message", async (message) => {
       message.channel.send(`Sorry, I couldn't find any posts in r/${query}`);
     }
   } else if (message.content.startsWith("!poll")) {
-    const colours = ["🟦", "🟪", "🟫", "🟥", "🟧", "🟨"];
-    let data = message.content.replace("!poll", "").replace("?", "").split("|");
-    data = data.map((x) => x.trim()).filter((x) => x != "");
-    const question = `${data.shift()}?`;
-    if (data.length == 0) {
-      // Yes or no question
-      const emojiNo = message.guild.emojis.cache.find(
-        (emoji) => emoji.name === "7685_no"
-      );
-      const emojiYes = message.guild.emojis.cache.find(
-        (emoji) => emoji.name === "2990_yes"
-      );
-      msg = await message.channel.send(`**${question}**`);
-      await msg.react(emojiNo);
-      await msg.react(emojiYes);
-    } else if (data.length > 1) {
-      // Multi choice questions, max options is the number of colours
-      data = data.slice(0, colours.length);
-      const options = [];
-      for (let i = 0; i < data.length; i++) {
-        options.push(`${colours[i]} ${data[i]}`);
-      }
-      msg = await message.channel.send(
-        `**${question}**\n${options.join("\n")}`
-      );
-      for (let i = 0; i < data.length; i++) {
-        msg.react(colours[i]);
-      }
-    }
+    client.commands.get("poll").execute(message);
   } else if (message.content === prefix + "stats") {
-    const data = await dynamodb.getItems(message.author.id);
-    const results = {};
-    if (data.length > 0) {
-      data.forEach((activity) => {
-        if (activity.endedTimestamp) {
-          if (activity.activity in results) {
-            results[activity.activity] +=
-              activity.endedTimestamp - activity.createdTimestamp;
-          } else {
-            results[activity.activity] =
-              activity.endedTimestamp - activity.createdTimestamp;
-          }
-        }
-      });
-
-      const output = [];
-      for (let [key, value] of Object.entries(results)) {
-        output.push([key, value]);
-      }
-      output.sort(function (a, b) {
-        return b[1] - a[1];
-      });
-
-      const username = message.member.toString();
-      const outputTable = [["Activity", "Duration"]];
-      for ([key, value] of output) {
-        outputTable.push([key, convertTime(Math.floor(~~(value / 1000)))]);
-      }
-
-      if (outputTable.length == 1) {
-        message.channel.send(
-          `Sorry, I couldn't find any statistics on record for ${username}`
-        );
-      } else {
-        message.channel.send(`${username}\n\`\`\`${table(outputTable)}\`\`\``);
-      }
-    } else {
-      const username = message.member.toString();
-      message.channel.send(
-        `Sorry, I couldn't find any statistics on record for ${username}`
-      );
-    }
+    client.commands.get("stats").execute(message);
   }
 });
 
@@ -213,17 +153,3 @@ client.on("presenceUpdate", (oldPresence, newPresence) => {
   }
 });
 client.login(config.token);
-
-function convertTime(sec) {
-  var hours = Math.floor(sec / 3600);
-  hours >= 1 ? (sec = sec - hours * 3600) : (hours = "00");
-  var min = Math.floor(sec / 60);
-  min >= 1 ? (sec = sec - min * 60) : (min = "00");
-  sec < 1 ? (sec = "00") : void 0;
-
-  hours.toString().length == 1 ? (hours = "0" + hours) : void 0;
-  min.toString().length == 1 ? (min = "0" + min) : void 0;
-  sec.toString().length == 1 ? (sec = "0" + sec) : void 0;
-
-  return hours + ":" + min + ":" + sec;
-}
