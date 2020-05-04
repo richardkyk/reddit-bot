@@ -1,5 +1,4 @@
 const dynamodb = require("../utility/dynamodb");
-const config = require("../config.json");
 
 module.exports = {
   disabled: false,
@@ -10,14 +9,16 @@ module.exports = {
     //   status: "online",
     //   activity: { name: "with my pp" },
     // });
-    client.guilds.cache.get(config.guild).presences.cache.forEach((user) => {
-      for (activity of user.activities) {
-        dynamodb.saveItem({
-          userId: user.userID,
-          createdTimestamp: activity.createdTimestamp,
-          activity: activity.name,
-        });
-      }
-    });
+    client.guilds.cache
+      .get(process.env.DISCORD_GUILD)
+      .presences.cache.forEach((user) => {
+        for (activity of user.activities) {
+          dynamodb.saveItem({
+            userId: user.userID,
+            createdTimestamp: activity.createdTimestamp,
+            activity: activity.name,
+          });
+        }
+      });
   },
 };

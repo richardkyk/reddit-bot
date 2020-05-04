@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
-const config = require("./config.json");
+const dotenv = require("dotenv");
+dotenv.config();
 const fs = require("fs");
 
 const client = new Discord.Client();
@@ -28,4 +29,4 @@ fs.readdir("./events/", (err, files) => {
   });
 });
 
-client.login(config.token);
+client.login(process.env.DISCORD_TOKEN);
