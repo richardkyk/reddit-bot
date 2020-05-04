@@ -1,7 +1,7 @@
 module.exports = {
   name: "poll",
   async execute(message) {
-    let data = message.content.replace("!poll", "").replace("?", "").split("|");
+    let data = message.content.replace("!poll", "").split("|");
     data = data.map((x) => x.trim().toTitleCase()).filter((x) => x != "");
     if (data.length > 0) {
       const question = `${data.shift()}?`;
