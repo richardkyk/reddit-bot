@@ -1,4 +1,4 @@
-const dynamodb = require("../GameActivity");
+const dynamodb = require("../utility/dynamodb");
 const { table } = require("table");
 
 module.exports = {
