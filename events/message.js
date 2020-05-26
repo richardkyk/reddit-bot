@@ -9,6 +9,8 @@ module.exports = {
       client.commands.get("poll").execute(message);
     } else if (message.content === "!stats") {
       client.commands.get("stats").execute(message);
+    } else if (message.content.startsWith("!report")) {
+      client.commands.get("report").execute(message);
     }
   },
 };
