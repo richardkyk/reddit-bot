@@ -29,18 +29,23 @@ module.exports = {
         const role = message.guild.roles.cache.find(
           (guild) => guild.name == "Reported"
         );
-        message.guild.member(memberId).roles.add(role);
+        message.guild
+          .member(memberId)
+          .roles.add(role)
+          .catch((err) => console.log(err));
         message.channel.send(
-          `**ID: ${reportId}**\nReport submitted for <@!${memberId}>.\nThank you for your contribution to the community.`
+          `Case ID: **${reportId}**\nYour report for <@!${memberId}> has been submitted.\nThank you for your contribution to the community.`
         );
       }
     } else if (data[1] in reports) {
       const reportId = data[1];
       message.channel.send(
-        `Time: ${reports[reportId].time}\nID: ${reports[reportId].id}\nStatus: ${reports[reportId].status}\nOffender: <@!${reports[reportId].offender}>\nReporter: <@!${reports[reportId].reporter}>`
+        `Time: ${reports[reportId].time}\nCase ID: ${reports[reportId].id}\nStatus: ${reports[reportId].status}\nOffender: <@!${reports[reportId].offender}>\nReporter: <@!${reports[reportId].reporter}>`
       );
     } else {
-      message.channel.send(`Sorry, I couldn't find member/report "${data[1]}"`);
+      message.channel.send(
+        `Sorry, I couldn't find member/case-id: "${data[1]}".`
+      );
     }
   },
 };

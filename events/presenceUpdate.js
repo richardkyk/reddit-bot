@@ -17,10 +17,10 @@ module.exports = {
         oldPresenceString.length !== 0 &&
         oldPresenceString.toString() !== newPresenceString.toString()
       ) {
-        console.log();
-        console.log("old Presence", JSON.parse(oldPresenceString));
-        console.log("new Presence", JSON.parse(newPresenceString));
-        // There is a bug here
+        // console.log();
+        // console.log("old Presence", JSON.parse(oldPresenceString));
+        // console.log("new Presence", JSON.parse(newPresenceString));
+
         // When the newPresence is the same as the oldPresence
         // There will not be a "new" activity, or an "old" one, they are both the same
         const newActivity = JSON.parse(

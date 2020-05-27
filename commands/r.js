@@ -49,8 +49,10 @@ async function getPosts(query, lastSeenId = null) {
     }
   }
 
-  const post = await r.getHot(query, { limit: 10, after: lastSeenId });
-  const newPosts = post.filter((p) => !(p.name in visited));
+  const post = await r.getHot(query, { limit: 5, after: lastSeenId });
+  const newPosts = post.filter(
+    (p) => !(p.name in visited) && !p.pinned && !p.stickied
+  );
   if (newPosts.length == 0) {
     lastSeenId = post[post.length - 1].name;
     return await getPosts(query, lastSeenId);
