@@ -15,7 +15,7 @@ module.exports = {
       .get(process.env.DISCORD_GUILD)
       .presences.cache.forEach((user) => {
         for (activity of user.activities) {
-          if (!activity in ignore) {
+          if (!ignore.includes(activity)) {
             dynamodb.saveItem({
               userId: user.userID,
               createdTimestamp: activity.createdTimestamp,

@@ -40,7 +40,7 @@ module.exports = {
         );
         if (
           oldActivity.name === newActivity.name &&
-          !oldActivity.name in ignore
+          !ignore.includes(oldActivity.name)
         ) {
           dynamodb.updateItem(
             oldPresence.user.id,
@@ -68,7 +68,7 @@ module.exports = {
             newPresence.member.user.username
           } started ${activity}`
         );
-        if (!activity in ignore) {
+        if (!ignore.includes(activity)) {
           dynamodb.saveItem({
             userId: newPresence.user.id,
             createdTimestamp: newActivity.createdTimestamp,
@@ -86,7 +86,7 @@ module.exports = {
             oldPresence.member.user.username
           } ended ${activity}`
         );
-        if (!activity in ignore) {
+        if (!ignore.includes(activity)) {
           dynamodb.updateItem(
             oldPresence.user.id,
             oldActivity.createdTimestamp,
