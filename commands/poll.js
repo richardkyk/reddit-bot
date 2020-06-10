@@ -4,7 +4,7 @@ module.exports = {
     let data = message.content.replace("!poll", "").split("|");
     data = data.map((x) => x.trim().toTitleCase()).filter((x) => x != "");
     if (data.length > 0) {
-      const question = `${data.shift()}?`;
+      const question = `${data.shift()}`;
       if (data.length == 0) {
         // Yes or no question
         const emojiNo = message.guild.emojis.cache.find(

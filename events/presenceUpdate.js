@@ -1,9 +1,11 @@
 const dynamodb = require("../utility/dynamodb");
+const moment = require("moment");
 
 module.exports = {
   disabled: false,
   event: "presenceUpdate",
   run(client, oldPresence, newPresence) {
+    const ignore = ["Spotify"];
     const oldPresenceString = oldPresence
       ? oldPresence.activities.map((x) => JSON.stringify(x))
       : [];
@@ -31,10 +33,15 @@ module.exports = {
           oldPresenceString.filter((x) => !newPresenceString.includes(x))[0]
         );
 
-        if (oldActivity.name === newActivity.name) {
-          console.log(
-            `${newPresence.member.user.username} updated ${newActivity.name}`
-          );
+        console.log(
+          `${moment().format("YYYY-MM-DD HH:mm")} ${
+            newPresence.member.user.username
+          } updated ${newActivity.name}`
+        );
+        if (
+          oldActivity.name === newActivity.name &&
+          !oldActivity.name in ignore
+        ) {
           dynamodb.updateItem(
             oldPresence.user.id,
             oldActivity.createdTimestamp,
@@ -56,25 +63,37 @@ module.exports = {
         );
 
         const activity = newActivity.name;
-        console.log(`${newPresence.member.user.username} started ${activity}`);
-        dynamodb.saveItem({
-          userId: newPresence.user.id,
-          createdTimestamp: newActivity.createdTimestamp,
-          activity,
-        });
+        console.log(
+          `${moment().format("YYYY-MM-DD HH:mm")} ${
+            newPresence.member.user.username
+          } started ${activity}`
+        );
+        if (!activity in ignore) {
+          dynamodb.saveItem({
+            userId: newPresence.user.id,
+            createdTimestamp: newActivity.createdTimestamp,
+            activity,
+          });
+        }
       } else {
         const oldActivity = JSON.parse(
           oldPresenceString.filter((x) => !newPresenceString.includes(x))[0]
         );
 
         const activity = oldActivity.name;
-        console.log(`${oldPresence.member.user.username} ended ${activity}`);
-        dynamodb.updateItem(
-          oldPresence.user.id,
-          oldActivity.createdTimestamp,
-          "endedTimestamp",
-          Date.now()
+        console.log(
+          `${moment().format("YYYY-MM-DD HH:mm")} ${
+            oldPresence.member.user.username
+          } ended ${activity}`
         );
+        if (!activity in ignore) {
+          dynamodb.updateItem(
+            oldPresence.user.id,
+            oldActivity.createdTimestamp,
+            "endedTimestamp",
+            Date.now()
+          );
+        }
       }
     }
   },
