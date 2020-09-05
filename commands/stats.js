@@ -7,9 +7,9 @@ module.exports = {
   async execute(message) {
     const data = await dynamodb.getItems(message.author.id);
     const results = {};
-    const resultsPastWeek = {};
     const oneWeekTimestamp = moment().subtract(1, "weeks").valueOf();
 
+    console.log(data.length);
     if (data.length > 0) {
       data.forEach((activity) => {
         if (activity.endedTimestamp) {
@@ -31,7 +31,7 @@ module.exports = {
           }
         }
       });
-
+      console.log(results);
       const output = [];
       for (let [key, value] of Object.entries(results)) {
         output.push([key, value]);
