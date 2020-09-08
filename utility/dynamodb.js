@@ -8,7 +8,7 @@ AWS.config.update({
 var dynamo = new AWS.DynamoDB.DocumentClient();
 
 var table = "activities";
-let allData = [];
+
 module.exports.updateItem = async (
   userId,
   createdTimestamp,
@@ -61,24 +61,24 @@ module.exports.getItems = async (userId) => {
   };
 
   try {
-    await getAllData(params);
-    return allData;
+    return await getAllData(params);
   } catch (err) {
     console.log(err);
   }
 };
 
-const getAllData = async (params) => {
+const getAllData = async (params, allData = []) => {
+  let partialData = allData;
   let data = await dynamo.query(params).promise();
 
   if (data["Items"].length > 0) {
-    allData = [...allData, ...data["Items"]];
+    partialData = [...allData, ...data["Items"]];
   }
 
   if (data.LastEvaluatedKey) {
     params.ExclusiveStartKey = data.LastEvaluatedKey;
-    return await getAllData(params);
+    return await getAllData(params, partialData);
   } else {
-    return data;
+    return partialData;
   }
 };
